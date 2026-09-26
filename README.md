@@ -1,16 +1,106 @@
-# React + Vite
+# LandStack
 
-This template provides a minimal setup to get React working in Vite with HMR and some Oxlint rules.
+LandStack is a modern digital land-governance and property information platform designed to make land records, property services, and administrative workflows more accessible, transparent, and structured.
 
-Currently, two official plugins are available:
+The platform follows a GIS and Digital Public Infrastructure–inspired approach, connecting citizens, land/property records, service requests, and government-style workflows through a unified web application.
 
-- [@vitejs/plugin-react](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react) uses [Oxc](https://oxc.rs)
-- [@vitejs/plugin-react-swc](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react-swc) uses [SWC](https://swc.rs/)
+## 🚀 Features
 
-## React Compiler
+### 👤 Citizen Portal
+- Citizen registration and secure login
+- JWT-based authentication
+- Personal citizen dashboard
+- Submit and track service requests
+- View request status and updates
+- Access land and property information
+- Explore parcels through the GIS-based Land Explorer
+- Notifications for important updates
 
-The React Compiler is not enabled on this template because of its impact on dev & build performances. To add it, see [this documentation](https://react.dev/learn/react-compiler/installation).
+### 🏛️ Officer Portal
+- Secure officer authentication
+- Officer dashboard
+- Service request management
+- Search and review land/property records
+- ULPIN-based parcel lookup
+- Verify and approve requests
+- Request additional information
+- Flag requests for further review
+- Update request statuses
+- Officer notifications
 
-## Expanding the Oxlint configuration
+### 🗺️ Land Explorer
+- GIS-inspired land/property exploration
+- Search by location
+- Search by land record
+- Find parcels on map
+- View citizen's properties
+- Parcel details and ownership information
+- Authentication-protected access
 
-If you are developing a production application, we recommend using TypeScript with type-aware lint rules enabled. Check out the [TS template](https://github.com/vitejs/vite/tree/main/packages/create-vite/template-react-ts) for information on how to integrate TypeScript and Oxlint's TypeScript related rules in your project.
+### 🔐 Security
+- JWT authentication
+- Password hashing with bcrypt
+- Role-based access control
+- Protected API routes
+- Citizen/Officer access separation
+- Backend authorization for property and service data
+- Environment-based secrets and configuration
+
+### 🔔 Notifications
+- Unread notification count
+- Mark individual notifications as read
+- Mark all notifications as read
+- Request status notifications
+
+### 🤖 AI Alerts
+- Land/property related alert interface
+- Alert review workflow
+- Alert summaries
+- Administrative review support
+
+### 🔗 Connected Systems
+LandStack includes a prototype interface for connected government-style systems and services. These integrations are represented as a sandbox/prototype layer and do not represent live government integrations.
+
+## 🏗️ Tech Stack
+
+### Frontend
+- React
+- Vite
+- JavaScript
+- REST API integration
+- Responsive web UI
+
+### Backend
+- Node.js
+- Express.js
+- REST APIs
+- JWT
+- bcryptjs
+- Helmet
+- CORS
+- Morgan
+
+### Database
+- PostgreSQL
+- Prisma ORM
+
+## 🧩 Architecture
+
+```text
+Citizen / Officer
+       │
+       ▼
+React + Vite Frontend
+       │
+       ▼
+REST API
+       │
+       ▼
+Node.js + Express
+       │
+       ▼
+Prisma ORM
+       │
+       ▼
+PostgreSQL
+
