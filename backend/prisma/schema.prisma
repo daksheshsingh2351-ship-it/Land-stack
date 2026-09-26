@@ -1,0 +1,249 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+model User {
+  id               String           @id @default(cuid())
+  email            String           @unique
+  password         String
+  name             String
+  role             UserRole         @default(CITIZEN)
+  phone            String?
+  avatarUrl        String?
+  isActive         Boolean          @default(true)
+  createdAt        DateTime         @default(now())
+  updatedAt        DateTime         @updatedAt
+  createdAlerts    AIAlert[]        @relation("AlertCreator")
+  notifications    Notification[]
+  ownerships       Ownership[]
+  requests         ServiceRequest[] @relation("RequestCreator")
+  assignedRequests ServiceRequest[] @relation("RequestOfficer")
+
+  @@index([role])
+  @@map("users")
+}
+
+model Parcel {
+  id                      String           @id @default(cuid())
+  ulpin                   String           @unique
+  plotNumber              String
+  surveyNo                String?
+  gatNumber               String?
+  khataNumber             String?
+  area                    Float
+  areaUnit                String           @default("sqm")
+  location                String
+  village                 String?
+  taluka                  String?
+  district                String?
+  state                   String?
+  landUse                 LandUse          @default(RESIDENTIAL)
+  zoning                  String?
+  status                  ParcelStatus     @default(PENDING)
+  riskStatus              RiskLevel        @default(LOW)
+  buildingPermission      String?
+  developmentRestrictions String?
+  propertyTaxStatus       String?
+  outstandingAmount       String?
+  encumbranceStatus       String?
+  mortgage                String?
+  electricity             String?
+  water                   String?
+  roadAccess              String?
+  registrationStatus      String?
+  lastTransactionDate     DateTime?
+  lastTransactionType     String?
+  registrationDocumentId  String?
+  lastUpdated             DateTime?
+  createdAt               DateTime         @default(now())
+  updatedAt               DateTime         @updatedAt
+  alerts                  AIAlert[]
+  ownerships              Ownership[]
+  requests                ServiceRequest[]
+
+  @@index([district, taluka, village])
+  @@index([plotNumber])
+  @@index([status])
+  @@map("parcels")
+}
+
+model Ownership {
+  id                 String          @id @default(cuid())
+  parcelId           String
+  userId             String?
+  ownerName          String
+  ownershipType      OwnershipType   @default(INDIVIDUAL)
+  ownershipStatus    OwnershipStatus @default(CLEAR_TITLE)
+  rorStatus          String?
+  verificationStatus String?
+  isCurrent          Boolean         @default(true)
+  acquiredDate       DateTime?
+  createdAt          DateTime        @default(now())
+  updatedAt          DateTime        @updatedAt
+  parcel             Parcel          @relation(fields: [parcelId], references: [id], onDelete: Cascade)
+  user               User?           @relation(fields: [userId], references: [id])
+
+  @@index([parcelId])
+  @@index([userId])
+  @@map("ownerships")
+}
+
+model ServiceRequest {
+  id          String        @id @default(cuid())
+  requestId   String        @unique
+  type        RequestType
+  status      RequestStatus @default(PENDING)
+  description String?
+  parcelId    String?
+  ulpin       String?
+  creatorId   String
+  officerId   String?
+  submittedAt DateTime      @default(now())
+  resolvedAt  DateTime?
+  createdAt   DateTime      @default(now())
+  updatedAt   DateTime      @updatedAt
+  creator     User          @relation("RequestCreator", fields: [creatorId], references: [id], onDelete: Cascade)
+  officer     User?         @relation("RequestOfficer", fields: [officerId], references: [id])
+  parcel      Parcel?       @relation(fields: [parcelId], references: [id])
+
+  @@index([creatorId])
+  @@index([officerId])
+  @@index([status])
+  @@map("service_requests")
+}
+
+model Notification {
+  id        String   @id @default(cuid())
+  userId    String
+  title     String
+  message   String
+  isRead    Boolean  @default(false)
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+  user      User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@index([userId, isRead])
+  @@map("notifications")
+}
+
+model AIAlert {
+  id             String        @id @default(cuid())
+  parcelId       String
+  alertType      String
+  severity       AlertSeverity @default(MEDIUM)
+  confidence     String?
+  title          String?
+  description    String?
+  recordedUse    String?
+  observedSignal String?
+  recommendation String?
+  status         AlertStatus   @default(REQUIRES_VERIFICATION)
+  createdById    String?
+  resolvedAt     DateTime?
+  createdAt      DateTime      @default(now())
+  updatedAt      DateTime      @updatedAt
+  createdBy      User?         @relation("AlertCreator", fields: [createdById], references: [id])
+  parcel         Parcel        @relation(fields: [parcelId], references: [id], onDelete: Cascade)
+
+  @@index([parcelId])
+  @@index([status])
+  @@map("ai_alerts")
+}
+
+model ConnectedSystem {
+  id          String       @id @default(cuid())
+  name        String       @unique
+  systemType  String
+  description String?
+  status      SystemStatus @default(DISCONNECTED)
+  lastSyncAt  DateTime?
+  createdAt   DateTime     @default(now())
+  updatedAt   DateTime     @updatedAt
+
+  @@map("connected_systems")
+}
+
+enum UserRole {
+  CITIZEN
+  OFFICER
+  ADMIN
+}
+
+enum LandUse {
+  RESIDENTIAL
+  COMMERCIAL
+  AGRICULTURAL
+  INDUSTRIAL
+  PUBLIC_INSTITUTIONAL
+}
+
+enum ParcelStatus {
+  VERIFIED
+  PENDING
+  DISPUTED
+  UNDER_REVIEW
+}
+
+enum RiskLevel {
+  LOW
+  MEDIUM
+  HIGH
+}
+
+enum OwnershipType {
+  INDIVIDUAL
+  JOINT
+  INSTITUTIONAL
+  GOVERNMENT
+}
+
+enum OwnershipStatus {
+  CLEAR_TITLE
+  DISPUTED
+  UNDER_VERIFICATION
+}
+
+enum RequestType {
+  UPDATE_ROR_DETAILS
+  BOUNDARY_VERIFICATION
+  TAX_DISPUTE_RESOLUTION
+  REGISTRATION_INFO
+  LAND_USE_VERIFICATION
+  PROPERTY_TAX_ISSUE
+  OTHER
+}
+
+enum RequestStatus {
+  PENDING
+  UNDER_REVIEW
+  ACTION_REQUIRED
+  VERIFIED
+  COMPLETED
+  REJECTED
+}
+
+enum AlertSeverity {
+  LOW
+  MEDIUM
+  HIGH
+  CRITICAL
+}
+
+enum AlertStatus {
+  REQUIRES_VERIFICATION
+  UNDER_REVIEW
+  RESOLVED
+  DISMISSED
+}
+
+enum SystemStatus {
+  CONNECTED
+  DISCONNECTED
+  SYNCING
+  ERROR
+}
