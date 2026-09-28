@@ -7,10 +7,6 @@ const LandingPage = () => {
   const { login, openModal } = useAppContext();
   const navigate = useNavigate();
 
-  const handleLogin = (role) => {
-    openModal('login', { role });
-  };
-
   const handleExplore = () => {
     navigate('/explorer');
   };
@@ -26,8 +22,8 @@ const LandingPage = () => {
             <h1 style={{ margin: 0, color: 'var(--text-primary)', fontSize: '1.25rem', fontWeight: 800, letterSpacing: '-0.02em' }}>LandStack</h1>
           </div>
           <div style={{ display: 'flex', gap: '12px', alignItems: 'center' }}>
-            <button className="btn btn-ghost" onClick={() => handleLogin('Citizen')}>Citizen Portal</button>
-            <button className="btn btn-primary" onClick={() => handleLogin('Officer')}>Officer Login</button>
+            <button className="btn btn-ghost" onClick={() => navigate('/portal')}>Citizen Portal</button>
+            <button className="btn btn-primary" onClick={() => navigate('/dashboard')}>Officer Portal</button>
           </div>
         </div>
       </header>
@@ -57,7 +53,7 @@ const LandingPage = () => {
                 <button className="btn btn-primary" style={{ padding: '14px 28px', fontSize: '1.125rem' }} onClick={handleExplore}>
                   Explore GIS Map <ArrowRight size={20} />
                 </button>
-                <button className="btn btn-outline" style={{ padding: '14px 28px', fontSize: '1.125rem', backgroundColor: 'white' }} onClick={() => handleLogin('Citizen')}>
+                <button className="btn btn-outline" style={{ padding: '14px 28px', fontSize: '1.125rem', backgroundColor: 'white' }} onClick={() => navigate('/portal')}>
                   Citizen Services
                 </button>
               </div>

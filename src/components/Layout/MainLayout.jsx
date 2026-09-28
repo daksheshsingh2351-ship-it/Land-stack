@@ -9,6 +9,15 @@ const MainLayout = () => {
   const navigate = useNavigate();
   const location = useLocation();
 
+  // Safe fallback for user to prevent crashes when bypassing authentication
+  const safeUser = user || {
+    name: location.pathname.includes('dashboard') ? 'Officer' : 'Citizen',
+    role: location.pathname.includes('dashboard') ? 'OFFICER' : 'CITIZEN'
+  };
+
+  const userName = safeUser?.name || 'User';
+  const userRole = safeUser?.role || 'CITIZEN';
+
   const [notificationsOpen, setNotificationsOpen] = useState(false);
   const [unreadCount, setUnreadCount] = useState(0);
   const [notifications, setNotifications] = useState([]);
@@ -76,7 +85,7 @@ const MainLayout = () => {
     showToast("Logged out successfully");
   };
 
-  const navItems = user?.role === 'CITIZEN'
+  const navItems = safeUser?.role === 'CITIZEN'
     ? [
         { path: '/portal',       label: 'Citizen Dashboard',  icon: User },
         { path: '/requests',     label: 'My Requests',        icon: FileText },
@@ -103,20 +112,6 @@ const MainLayout = () => {
     if (location.pathname.includes('/systems'))     return 'Connected Systems';
     return 'LandStack Platform';
   };
-
-  if (!user) {
-    if (location.pathname === '/explorer' || location.pathname === '/explorer/') {
-      return <Navigate to="/" replace />;
-    }
-    return (
-      <div style={{ height: '100vh', display: 'flex', alignItems: 'center', justifyContent: 'center', backgroundColor: 'var(--bg-color)', flexDirection: 'column' }}>
-        <Layers size={48} color="var(--primary-color)" style={{ marginBottom: '24px' }} />
-        <h2>Session Expired</h2>
-        <p className="text-muted" style={{ marginBottom: '24px', marginTop: '8px' }}>Please log in to continue.</p>
-        <button className="btn btn-primary" onClick={() => navigate('/')}>Return to Login</button>
-      </div>
-    );
-  }
 
   return (
     <div style={{ display: 'flex', minHeight: '100vh', backgroundColor: 'var(--bg-color)' }}>
@@ -147,11 +142,11 @@ const MainLayout = () => {
         <div style={{ padding: '24px', borderBottom: '1px solid var(--border-color)' }}>
           <div style={{ display: 'flex', alignItems: 'center', gap: '12px' }}>
             <div style={{ width: '40px', height: '40px', borderRadius: 'var(--radius-full)', backgroundColor: 'var(--primary-light)', display: 'flex', alignItems: 'center', justifyContent: 'center', color: 'var(--primary-color)', fontWeight: 600 }}>
-              {user.name.charAt(0)}
+              {userName.charAt(0)}
             </div>
             <div style={{ overflow: 'hidden' }}>
-              <div style={{ fontWeight: 600, whiteSpace: 'nowrap', textOverflow: 'ellipsis', overflow: 'hidden' }}>{user.name}</div>
-              <div className="text-small text-muted">{user.role}</div>
+              <div style={{ fontWeight: 600, whiteSpace: 'nowrap', textOverflow: 'ellipsis', overflow: 'hidden' }}>{userName}</div>
+              <div className="text-small text-muted">{userRole}</div>
             </div>
           </div>
         </div>
@@ -278,14 +273,14 @@ const MainLayout = () => {
                 title="Profile"
                 onClick={toggleProfileMenu}
               >
-                {user.name.charAt(0)}
+                {userName.charAt(0)}
               </div>
 
               {profileMenuOpen && (
                 <div style={{ position: 'absolute', top: '100%', right: 0, marginTop: '8px', width: '200px', backgroundColor: 'var(--surface-color)', border: '1px solid var(--border-color)', borderRadius: 'var(--radius-md)', boxShadow: 'var(--shadow-lg)', zIndex: 100 }}>
                   <div style={{ padding: '16px', borderBottom: '1px solid var(--border-color)' }}>
-                    <div style={{ fontWeight: 600 }}>{user.name}</div>
-                    <div className="text-small text-muted">{user.role}</div>
+                    <div style={{ fontWeight: 600 }}>{userName}</div>
+                    <div className="text-small text-muted">{userRole}</div>
                   </div>
                   <div style={{ padding: '8px 0' }}>
                     <div className="hover-row" style={{ padding: '8px 16px', cursor: 'pointer', display: 'flex', alignItems: 'center', gap: '8px' }}

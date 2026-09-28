@@ -7,18 +7,27 @@
     "dev": "vite",
     "build": "vite build",
     "lint": "oxlint",
-    "preview": "vite preview"
+    "preview": "vite preview",
+    "postinstall": "prisma generate --schema=./backend/prisma/schema.prisma"
   },
   "dependencies": {
+    "@prisma/client": "^6.19.3",
+    "bcryptjs": "^3.0.3",
+    "cors": "^2.8.5",
+    "dotenv": "^16.5.0",
+    "express": "^5.1.0",
+    "helmet": "^8.3.0",
+    "jsonwebtoken": "^9.0.3",
     "leaflet": "^1.9.4",
     "lucide-react": "^1.48.0",
+    "morgan": "^1.10.0",
     "react": "^19.2.8",
     "react-dom": "^19.2.8",
     "react-leaflet": "^5.0.0",
-    "react-router-dom": "^7.18.4"
+    "react-router-dom": "^7.18.4",
+    "serverless-http": "^4.0.0"
   },
   "devDependencies": {
-    "@prisma/client": "^6.19.3",
     "@types/react": "^19.2.18",
     "@types/react-dom": "^19.2.7",
     "@vitejs/plugin-react": "^6.1.1",

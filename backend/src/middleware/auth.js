@@ -4,49 +4,16 @@ import prisma from '../config/database.js';
 
 /**
  * Authentication middleware.
- * Reads Bearer token from Authorization header, verifies JWT,
- * and attaches the authenticated user to req.user.
+ * Bypasses JWT verification and uses a mock user based on the x-mock-role header
+ * to allow direct access to portals without login.
  */
 export const authenticate = async (req, res, next) => {
   try {
-    const authHeader = req.headers.authorization;
-
-    if (!authHeader || !authHeader.startsWith('Bearer ')) {
-      return res.status(401).json({
-        success: false,
-        message: 'Authentication required. Provide a Bearer token.',
-      });
-    }
-
-    const token = authHeader.split(' ')[1];
-
-    if (!token) {
-      return res.status(401).json({
-        success: false,
-        message: 'Authentication required. Token is missing.',
-      });
-    }
-
-    // Verify token
-    let decoded;
-    try {
-      decoded = jwt.verify(token, config.jwtSecret);
-    } catch (err) {
-      if (err.name === 'TokenExpiredError') {
-        return res.status(401).json({
-          success: false,
-          message: 'Token has expired. Please log in again.',
-        });
-      }
-      return res.status(401).json({
-        success: false,
-        message: 'Invalid token.',
-      });
-    }
-
-    // Fetch user from database (without password)
-    const user = await prisma.user.findUnique({
-      where: { id: decoded.userId },
+    const role = req.headers['x-mock-role'] || 'CITIZEN';
+    
+    // Fetch a user from database that matches the requested role
+    let user = await prisma.user.findFirst({
+      where: { role },
       select: {
         id: true,
         email: true,
@@ -59,10 +26,16 @@ export const authenticate = async (req, res, next) => {
     });
 
     if (!user) {
-      return res.status(401).json({
-        success: false,
-        message: 'User not found. Token may be invalid.',
-      });
+      // Fallback if no matching user exists in the database
+      user = { 
+        id: 'mock-id-fallback', 
+        email: 'mock@example.com', 
+        name: 'Mock User', 
+        role, 
+        phone: '0000000000', 
+        isActive: true, 
+        createdAt: new Date() 
+      };
     }
 
     if (!user.isActive) {

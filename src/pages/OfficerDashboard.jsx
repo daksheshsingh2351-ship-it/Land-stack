@@ -13,6 +13,7 @@ const OfficerDashboard = () => {
   });
   const [requests, setRequests] = useState([]);
   const [aiAlertsCount, setAiAlertsCount] = useState(0);
+  const [aiAlerts, setAiAlerts] = useState([]);
 
   const fetchData = async () => {
     setIsRefreshing(true);
@@ -57,6 +58,10 @@ const OfficerDashboard = () => {
 
   const handleRefresh = () => {
     fetchData();
+  };
+
+  const dismissAlert = (ulpin) => {
+    setAiAlerts(prev => prev.filter(a => a.ulpin !== ulpin));
   };
 
   return (

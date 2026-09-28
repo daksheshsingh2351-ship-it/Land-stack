@@ -1,19 +1,27 @@
-import React from 'react';
-import { Navigate, Outlet } from 'react-router-dom';
+import React, { useEffect } from 'react';
+import { Outlet, useLocation } from 'react-router-dom';
 import { useAppContext } from '../../context/AppContext';
 
 const ProtectedRoute = ({ allowedRoles }) => {
-  const { user } = useAppContext();
+  const { user, login } = useAppContext();
+  const location = useLocation();
 
-  if (!user) {
-    // Not logged in
-    return <Navigate to="/" replace />;
-  }
-
-  if (allowedRoles && !allowedRoles.includes(user.role)) {
-    // Logged in but not the right role. Redirect to appropriate dashboard.
-    return <Navigate to={user.role === 'CITIZEN' ? '/portal' : '/dashboard'} replace />;
-  }
+  useEffect(() => {
+    // Automatically set mock user based on route to bypass authentication
+    if (location.pathname.startsWith('/dashboard') || location.pathname.startsWith('/intelligence') || location.pathname.startsWith('/systems')) {
+      if (!user || user.role !== 'OFFICER') {
+        login({ id: 'mock-officer', name: 'Officer', role: 'OFFICER' });
+      }
+    } else if (location.pathname.startsWith('/portal') || location.pathname.startsWith('/requests')) {
+      if (!user || user.role !== 'CITIZEN') {
+        login({ id: 'mock-citizen', name: 'Citizen', role: 'CITIZEN' });
+      }
+    } else {
+       if (!user) {
+         login({ id: 'mock-citizen', name: 'Citizen', role: 'CITIZEN' });
+       }
+    }
+  }, [location.pathname, user, login]);
 
   return <Outlet />;
 };

@@ -26,6 +26,7 @@ if (config.nodeEnv !== 'production') {
 
 // ── API routes ────────────────────────────────────────────────────
 app.use('/api', routes);
+app.use('/.netlify/functions/api', routes);
 
 // ── Error handling (must be last) ─────────────────────────────────
 app.use(notFoundHandler);

@@ -1,4 +1,4 @@
-const API_BASE = import.meta.env.VITE_API_BASE_URL || 'http://localhost:5000/api';
+const API_BASE = import.meta.env.VITE_API_BASE_URL || (import.meta.env.PROD ? '/api' : 'http://localhost:5000/api');
 
 export const getAuthToken = () => localStorage.getItem('landstack_jwt');
 export const setAuthToken = (token) => localStorage.setItem('landstack_jwt', token);
@@ -6,9 +6,16 @@ export const removeAuthToken = () => localStorage.removeItem('landstack_jwt');
 
 export const apiFetch = async (endpoint, options = {}) => {
   const token = getAuthToken();
+  const userStr = localStorage.getItem('landstack_user');
+  let role = 'CITIZEN';
+  if (userStr) {
+     try { role = JSON.parse(userStr).role; } catch(e){}
+  }
+  
   const headers = {
     'Content-Type': 'application/json',
     ...(token ? { Authorization: `Bearer ${token}` } : {}),
+    'x-mock-role': role,
     ...options.headers,
   };
 

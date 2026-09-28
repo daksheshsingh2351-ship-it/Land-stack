@@ -12,7 +12,9 @@ const config = {
   databaseUrl: process.env.DATABASE_URL || '',
   jwtSecret: jwtSecret,
   nodeEnv: process.env.NODE_ENV || 'development',
-  corsOrigins: ['http://localhost:5173', 'http://localhost:5174', 'http://localhost:5175', 'http://localhost:3000'],
+  corsOrigins: process.env.FRONTEND_URL 
+    ? [process.env.FRONTEND_URL, 'http://localhost:5173', 'http://localhost:5174', 'http://localhost:5175', 'http://localhost:3000']
+    : ['http://localhost:5173', 'http://localhost:5174', 'http://localhost:5175', 'http://localhost:3000'],
 };
 
 export default config;
